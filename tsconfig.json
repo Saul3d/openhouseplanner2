@@ -16,12 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-<<<<<<< HEAD
   "include": [
     "src"
   ]
-=======
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
->>>>>>> 090d321 (Reworked project using vite and zod)
 }
