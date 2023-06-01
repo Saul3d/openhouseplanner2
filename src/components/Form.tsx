@@ -6,6 +6,26 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 
+interface Expense {
+  id: number;
+  address: string;
+  category: string;
+  expenseDate: string;
+  amount: number;
+  description: string;
+}
+interface Props {
+  expenses: Expense[];
+  onAddNewExpense: (
+    id: number, 
+    address: string,
+    expenseDate: Date,
+    amount: number,
+    category: string,
+    description: string
+  ) => void;
+}
+
 const expenseType = [
   { id: 0, name: "" },
   { id: 1, name: "Indoor Maintenance" },
@@ -15,15 +35,20 @@ const expenseType = [
 ];
 
 const schema = z.object({
-  rentalPropertyAddress: z.string().min(10, {message: "Must enter a valid address"}),
+  rentalPropertyAddress: z
+    .string()
+    .min(10, { message: "Must enter a valid address" }),
   expenseType: z.enum([
     "Indoor Maintenance",
     "Outdoor Maintenance",
     "Misc",
     "Taxes",
   ]),
-  description: z.string().min(3, {message: "Required"}),
+  description: z.string().min(3, { message: "Required" }),
+  amount: z.string()
 });
+
+// console.log(schema.shape.expenseType);
 
 type FormData = z.infer<typeof schema>;
 
@@ -31,9 +56,10 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Form = () => {
+const Form = ({ expenses, onAddNewExpense }: Props) => {
   const [selected, setSelected] = useState(expenseType[0]);
   const [query, setQuery] = useState("");
+
 
   const filteredExpenses =
     query === ""
@@ -48,10 +74,12 @@ const Form = () => {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  const onSubmit = (data: FieldValues) => console.log(data);
+ 
+
+  const addExpense = (data: FieldValues) => console.log(data);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-2/3">
+    <form onSubmit={handleSubmit(addExpense)} className="w-2/3">
       <div className="mb-3 flex flex-col">
         <label
           htmlFor="rentalPropertyAddress"
@@ -167,9 +195,30 @@ const Form = () => {
           <p className="text-red-600 text-xs">{errors.description.message}</p>
         )}
       </div>
+      <div className="mb-3 flex flex-col">
+        <label
+          htmlFor="amount"
+          className="block text-sm font-medium leading-6 text-gray-900"
+        >
+          Amount
+        </label>
+
+        <input
+          {...register("amount")}
+          type="text"
+          id="amount"
+          className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          placeholder="Enter the amount for the expense"
+          aria-describedby="expense-amount"
+        />
+        {errors.amount && (
+          <p className="text-red-600 text-xs">{errors.amount.message}</p>
+        )}
+      </div>
       <button
         type="submit"
         className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        onClick = { () => onAddNewExpense({})}
       >
         Submit
       </button>
